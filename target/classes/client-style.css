@@ -1,0 +1,235 @@
+/* client-style.css - Bright & Clean Messenger Style (Final Version) */
+
+/* --- TỔNG QUAN --- */
+.root {
+    -fx-font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+    -fx-background-color: #f0f2f5; /* Nền ứng dụng màu xám nhạt */
+}
+
+/* --- SCROLL BAR (Thanh cuộn tinh tế) --- */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #cccccc;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #b3b3b3;
+}
+
+.scroll-bar .increment-button, .scroll-bar .decrement-button {
+    -fx-padding: 0;
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}
+
+/* --- PANELS (Khung chứa Users/Groups) --- */
+.panel-box {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.08), 10, 0, 0, 2);
+    -fx-padding: 10;
+}
+
+/* --- TABLE VIEW (Danh sách User/Group) --- */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent;
+}
+
+/* Ẩn Header của bảng */
+.table-view .column-header-background {
+    -fx-max-height: 0;
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}
+
+.table-view .table-cell {
+    -fx-padding: 12 10;
+    -fx-alignment: CENTER-LEFT;
+    -fx-border-color: transparent;
+    -fx-text-fill: #333333;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+}
+
+/* Dòng trong bảng */
+.table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #f0f0f0 transparent;
+    -fx-cursor: hand;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #f5f6f7;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #e7f3ff;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8;
+}
+
+.table-row-cell:selected .text {
+    -fx-fill: #0084ff;
+    -fx-font-weight: bold;
+}
+
+/* --- TAB PANE (Khu vực Chat chính) --- */
+.tab-pane {
+    -fx-background-color: #ffffff;
+}
+
+.tab-pane .tab-header-area {
+    -fx-padding: 5 5 0 5;
+    -fx-background-color: #ffffff;
+}
+
+.tab-pane .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.tab {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #65676b;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+
+.tab:hover {
+    -fx-background-color: #f2f2f2;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #0084ff transparent;
+    -fx-border-width: 3;
+    -fx-text-fill: #0084ff;
+}
+
+/* --- CHAT AREA (Khu vực nội dung chat) --- */
+/* QUAN TRỌNG: Cấu hình cho ListView chat */
+.list-view {
+    -fx-background-color: #ffffff;
+    -fx-padding: 10;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 2 0;
+    -fx-border-width: 0; /* Xóa viền cell */
+}
+
+.list-cell:empty {
+    -fx-background-color: transparent;
+}
+
+/* --- BỔ SUNG QUAN TRỌNG: ẨN CÁC DÒNG KẺ THỪA (GAP FIX) --- */
+/* Đoạn này giúp khung chat sạch sẽ, không có các dòng kẻ ngang khi ít tin nhắn */
+.list-view .virtual-flow .clipped-container .sheet .cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.list-view .virtual-flow .clipped-container .sheet {
+    -fx-background-color: transparent;
+}
+
+/* --- BUBBLES (Bong bóng chat) --- */
+.msg-bubble {
+    -fx-padding: 10 14;
+    -fx-background-radius: 18;
+    -fx-font-size: 14px;
+    -fx-max-width: 500px;
+}
+
+/* Tin nhắn của MÌNH */
+.msg-sent {
+    -fx-background-color: linear-gradient(to right, #00c6ff, #0072ff);
+    -fx-background-radius: 18 18 2 18;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 132, 255, 0.2), 5, 0, 0, 2);
+}
+
+.msg-sent .text {
+    -fx-fill: white;
+}
+
+/* Tin nhắn NGƯỜI KHÁC */
+.msg-received {
+    -fx-background-color: #e4e6eb;
+    -fx-background-radius: 18 18 18 2;
+}
+
+.msg-received .text {
+    -fx-fill: #050505;
+}
+
+/* Meta Data */
+.msg-meta {
+    -fx-font-size: 10px;
+    -fx-text-fill: #8a8d91;
+    -fx-padding: 2 5 5 5;
+}
+
+/* --- INPUT BAR (Khung nhập liệu) --- */
+.input-container {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15;
+    -fx-border-color: #f0f0f0 transparent transparent transparent;
+}
+
+.message-field {
+    -fx-background-color: #f0f2f5;
+    -fx-background-radius: 20;
+    -fx-border-width: 0;
+    -fx-padding: 10 15;
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+}
+
+.message-field:focused {
+    -fx-background-color: #e4e6eb;
+}
+
+/* --- BUTTONS --- */
+.button {
+    -fx-background-color: #e4e6eb;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #d8dadf;
+}
+
+.icon-button, .send-button {
+    -fx-background-color: transparent;
+}
+
+.icon-button {
+    -fx-text-fill: #0084ff;
+    -fx-font-size: 20px;
+}
+
+.icon-button:hover {
+    -fx-background-color: #f2f2f2;
+    -fx-background-radius: 50%;
+}
+
+.send-button {
+    -fx-text-fill: #0084ff;
+    -fx-font-size: 24px;
+}
+
+.send-button:hover {
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}

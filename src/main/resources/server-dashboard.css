@@ -1,0 +1,54 @@
+/* server-dashboard.css */
+* { -fx-font-family: 'Segoe UI', 'Roboto', sans-serif; }
+
+.root { -fx-background-color: #f4f7fa; }
+
+/* SIDEBAR */
+.sidebar {
+    -fx-background-color: #2c3e50;
+    -fx-padding: 20 0;
+}
+.app-title {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-padding: 0 0 20 0;
+}
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #b0c4de;
+    -fx-alignment: CENTER-LEFT;
+    -fx-padding: 12 20;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-border-width: 0 0 0 4; /* Border left marker */
+    -fx-border-color: transparent;
+}
+.nav-button:hover {
+    -fx-background-color: #34495e;
+    -fx-text-fill: white;
+}
+.nav-button.active {
+    -fx-background-color: #2980b9;
+    -fx-text-fill: white;
+    -fx-border-color: white; /* Active marker */
+}
+
+/* CARDS (Dùng cho thống kê) */
+.stat-card {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+    -fx-background-radius: 8px;
+    -fx-padding: 20;
+}
+.card-title { -fx-text-fill: #7f8c8d; -fx-font-size: 14px; }
+.card-value { -fx-text-fill: #2c3e50; -fx-font-size: 24px; -fx-font-weight: bold; }
+
+/* LOGS AREA */
+.log-console {
+    -fx-background-color: #1e1e1e;
+    -fx-text-fill: #00ff00;
+    -fx-font-family: 'Consolas', monospace;
+    -fx-background-radius: 8px;
+}

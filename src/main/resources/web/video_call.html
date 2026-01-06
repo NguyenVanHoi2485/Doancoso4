@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ChatApp Video Call</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        /* --- CẤU TRÚC CHUNG --- */
+        body {
+            margin: 0;
+            background: #1c1e21;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            background: black;
+        }
+
+        #peer-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 1;
+        }
+
+        #my-video {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 240px;
+            height: 180px;
+            border-radius: 12px;
+            z-index: 2;
+            transform: scaleX(-1);
+            background: #333;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        #my-video:hover {
+            transform: scaleX(-1) scale(1.05);
+            border-color: white;
+        }
+
+        #status {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- THANH ĐIỀU KHIỂN (CONTROLS) --- */
+        .controls {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 20px;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.6); /* Nền mờ cho thanh điều khiển */
+            border-radius: 40px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Style chung cho nút tròn */
+        .btn-action {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-action:active {
+            transform: scale(0.9);
+        }
+
+        /* Nút thường (Mic/Cam) - Mặc định màu xám trong suốt */
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.35);
+        }
+
+        /* Trạng thái TẮT (Màu đỏ) */
+        .btn-off {
+            background-color: #ff3b30 !important;
+            color: white;
+            position: relative;
+        }
+
+        /* Gạch chéo khi tắt (dùng pseudo-element) */
+        .btn-off::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: white;
+            transform: rotate(45deg);
+        }
+
+        /* Nút Kết thúc (Đỏ to) */
+        .btn-end {
+            width: 60px; /* To hơn chút */
+            height: 60px;
+            background-color: #ff3b30;
+            font-size: 28px;
+        }
+
+        .btn-end:hover {
+            background-color: #d63026;
+            transform: scale(1.1);
+        }
+
+        /* Overlay kết thúc */
+        #ended-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(28, 30, 33, 0.95);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .btn-close {
+            padding: 12px 30px;
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: 0.2s;
+        }
+
+        .btn-close:hover {
+            background: #444;
+            border-color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="ended-overlay">
+    <h1>Cuộc gọi đã kết thúc</h1>
+    <p>Bạn có thể đóng cửa sổ này.</p>
+    <button class="btn-close" onclick="window.close()">Đóng ngay</button>
+</div>
+
+<div class="video-wrapper">
+    <div id="status">Initializing...</div>
+
+    <video id="peer-video" autoplay playsinline></video>
+    <video id="my-video" autoplay playsinline muted></video>
+
+    <div class="controls">
+        <button id="btn-mic" class="btn-action btn-secondary" onclick="toggleMic()" title="Bật/Tắt Mic">
+            🎤
+        </button>
+
+        <button class="btn-action btn-end" onclick="endCall(true)" title="Kết thúc">
+            📞
+        </button>
+
+        <button id="btn-cam" class="btn-action btn-secondary" onclick="toggleCam()" title="Bật/Tắt Camera">
+            📷
+        </button>
+    </div>
+</div>
+
+<script>
+    const CONFIG = {
+        roomId: "__ROOM_ID__",
+        userId: "__USER_ID__",
+        targetUser: "__TARGET_USER__",
+        callbackPort: "__CALLBACK_PORT__"
+    };
+
+    const statusDiv = document.getElementById('status');
+    const myVideo = document.getElementById('my-video');
+    const peerVideo = document.getElementById('peer-video');
+    const endedOverlay = document.getElementById('ended-overlay');
+
+    // Nút điều khiển
+    const btnMic = document.getElementById('btn-mic');
+    const btnCam = document.getElementById('btn-cam');
+
+    if (CONFIG.roomId.includes("__ROOM")) {
+        statusDiv.innerText = "Lỗi Java Replace (Check Encoding)";
+        statusDiv.style.background = "rgba(255,0,0,0.5)";
+        throw new Error("Missing Config");
+    }
+
+    let localStream;
+    let peer;
+    let currentCall;
+    let dataConn;
+
+    // Trạng thái thiết bị
+    let isMicOn = true;
+    let isCamOn = true;
+
+    // --- SETUP PEER ---
+    const myPeerId = CONFIG.roomId + "_" + CONFIG.userId;
+    console.log("My Peer ID:", myPeerId);
+    statusDiv.innerText = "Connecting as: " + CONFIG.userId;
+
+    peer = new Peer(myPeerId, {debug: 2});
+
+    peer.on('open', (id) => {
+        statusDiv.innerText = "Waiting for connection...";
+        startLocalVideo();
+    });
+
+    peer.on('error', (err) => {
+        console.error(err);
+        statusDiv.innerText = "Error: " + err.type;
+        statusDiv.style.background = "rgba(255,0,0,0.5)";
+    });
+
+    peer.on('call', (call) => {
+        statusDiv.innerText = "Connecting...";
+        call.answer(localStream);
+        call.on('close', () => {
+            forceEndLogic();
+        });
+        call.on('stream', (remoteStream) => {
+            peerVideo.srcObject = remoteStream;
+            statusDiv.innerText = "Connected";
+            setTimeout(() => {
+                statusDiv.style.opacity = '0';
+            }, 3000);
+        });
+        currentCall = call;
+    });
+
+    peer.on('connection', (conn) => {
+        setupDataConnection(conn);
+    });
+
+    function setupDataConnection(conn) {
+        dataConn = conn;
+        dataConn.on('data', (data) => {
+            if (data === "END_CALL") {
+                notifyJavaApp();
+                forceEndLogic();
+            }
+        });
+    }
+
+    // --- MEDIA FUNCTIONS ---
+
+    function startLocalVideo() {
+        navigator.mediaDevices.getUserMedia({video: true, audio: true})
+            .then((stream) => {
+                localStream = stream;
+                myVideo.srcObject = stream;
+
+                if (CONFIG.targetUser && CONFIG.targetUser !== "null" && CONFIG.targetUser.trim() !== "") {
+                    connectToPeer(CONFIG.targetUser);
+                }
+            })
+            .catch((err) => {
+                statusDiv.innerText = "Camera Error: " + err.message;
+                statusDiv.style.background = "rgba(255,0,0,0.5)";
+            });
+    }
+
+    // --- LOGIC BẬT/TẮT MIC & CAM ---
+
+    function toggleMic() {
+        if (localStream) {
+            const audioTrack = localStream.getAudioTracks()[0];
+            if (audioTrack) {
+                isMicOn = !isMicOn;
+                audioTrack.enabled = isMicOn; // Bật/Tắt track
+
+                // Cập nhật giao diện nút
+                if (isMicOn) {
+                    btnMic.classList.remove('btn-off');
+                } else {
+                    btnMic.classList.add('btn-off');
+                }
+            }
+        }
+    }
+
+    function toggleCam() {
+        if (localStream) {
+            const videoTrack = localStream.getVideoTracks()[0];
+            if (videoTrack) {
+                isCamOn = !isCamOn;
+                videoTrack.enabled = isCamOn; // Bật/Tắt track
+
+                // Cập nhật giao diện nút
+                if (isCamOn) {
+                    btnCam.classList.remove('btn-off');
+                } else {
+                    btnCam.classList.add('btn-off');
+                }
+            }
+        }
+    }
+
+    // --- KẾT NỐI & DỌN DẸP ---
+
+    function connectToPeer(targetUser) {
+        const targetPeerId = CONFIG.roomId + "_" + targetUser;
+        statusDiv.innerText = "Calling " + targetUser + "...";
+
+        setTimeout(() => {
+            const call = peer.call(targetPeerId, localStream);
+            call.on('stream', (remoteStream) => {
+                peerVideo.srcObject = remoteStream;
+                statusDiv.innerText = "Connected";
+                setTimeout(() => {
+                    statusDiv.style.opacity = '0';
+                }, 3000);
+            });
+            call.on('close', () => {
+                forceEndLogic();
+            });
+            call.on('error', (e) => {
+                console.log("Call retry...", e);
+                setTimeout(() => connectToPeer(targetUser), 2000);
+            });
+            currentCall = call;
+
+            const conn = peer.connect(targetPeerId);
+            setupDataConnection(conn);
+        }, 1500);
+    }
+
+    function endCall(sendSignal) {
+        if (sendSignal && dataConn && dataConn.open) {
+            dataConn.send("END_CALL");
+        }
+        notifyJavaApp();
+        forceEndLogic();
+    }
+
+    function notifyJavaApp() {
+        if (!CONFIG.callbackPort || CONFIG.callbackPort.includes("__CALLBACK")) return;
+        try {
+            fetch('http://localhost:' + CONFIG.callbackPort + '/end', {
+                mode: 'no-cors', method: 'GET'
+            }).catch(e => {
+            });
+        } catch (e) {
+        }
+    }
+
+    function forceEndLogic() {
+        if (currentCall) currentCall.close();
+        if (peer) peer.destroy();
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+        }
+        endedOverlay.style.display = "flex";
+        setTimeout(() => {
+            try {
+                window.close();
+            } catch (e) {
+            }
+        }, 1000);
+    }
+
+    window.addEventListener('beforeunload', function (e) {
+        notifyJavaApp();
+    });
+</script>
+</body>
+</html>
