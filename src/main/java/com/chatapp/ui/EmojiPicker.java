@@ -31,6 +31,9 @@ public class EmojiPicker extends Dialog<String> {
             "⚽🏀🏈⚾🥎🎾🏐🏉🎱🥏🏓🏸🏒🥅🥋🥊🎣🤿🎽"
     };
 
+    /**
+     * Khởi tạo hộp thoại chọn Emoji, cấu hình giao diện lưới và sự kiện click.
+     */
     public EmojiPicker() {
         setTitle("Choose an Emoji");
         setHeaderText(null); // Bỏ header text để giao diện gọn hơn
@@ -115,6 +118,9 @@ public class EmojiPicker extends Dialog<String> {
         getDialogPane().setStyle("-fx-font-family: 'Segoe UI Emoji', sans-serif;");
     }
 
+    /**
+     * Phương thức tĩnh để hiển thị hộp thoại chọn Emoji và xử lý kết quả trả về.
+     */
     public static void showEmojiPicker(javafx.stage.Window owner, Consumer<String> onEmojiSelected) {
         EmojiPicker picker = new EmojiPicker();
         picker.initOwner(owner);

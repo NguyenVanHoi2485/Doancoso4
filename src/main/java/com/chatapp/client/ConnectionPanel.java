@@ -18,6 +18,10 @@ public class ConnectionPanel extends VBox {
     private Button connectButton;
     private final ChatClient chatClient;
 
+    /**
+     * Khởi tạo giao diện panel kết nối, bao gồm các trường nhập liệu (Server, Username, Password)
+     * và các nút chức năng (Đăng nhập, Quên mật khẩu, Đăng ký).
+     */
     public ConnectionPanel(ChatClient chatClient) {
         this.chatClient = chatClient;
 
@@ -66,6 +70,9 @@ public class ConnectionPanel extends VBox {
         getChildren().addAll(title, serverBox, userBox, passBox, connectButton, forgotPassLink, registerLink);
     }
 
+    /**
+     * Phương thức tiện ích để tạo một cụm giao diện gồm nhãn (Label) và ô nhập liệu (TextField) được sắp xếp dọc.
+     */
     private VBox createInputBox(String labelText, String prompt) {
         Label label = new Label(labelText);
         label.setStyle("-fx-font-weight: bold; -fx-text-fill: #555;");
@@ -76,6 +83,9 @@ public class ConnectionPanel extends VBox {
         return new VBox(5, label, field);
     }
 
+    /**
+     * Xử lý sự kiện khi nút Đăng nhập được nhấn: kiểm tra dữ liệu đầu vào, kết nối tới server và gửi yêu cầu đăng nhập.
+     */
     private void handleLogin() {
         String server = serverField.getText().trim();
         String user = usernameField.getText().trim();
@@ -92,6 +102,10 @@ public class ConnectionPanel extends VBox {
     }
 
     // --- DIALOG QUÊN MẬT KHẨU ---
+
+    /**
+     * Hiển thị hộp thoại cho phép người dùng đặt lại mật khẩu mới bằng cách gửi yêu cầu Reset Password tới server.
+     */
     private void showForgotPasswordDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.initOwner(getScene().getWindow());
@@ -133,6 +147,9 @@ public class ConnectionPanel extends VBox {
         });
     }
 
+    /**
+     * Hiển thị hộp thoại đăng ký tài khoản mới và gửi yêu cầu đăng ký tới server sau khi người dùng xác nhận.
+     */
     private void showRegisterDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.initOwner(getScene().getWindow());
@@ -168,6 +185,9 @@ public class ConnectionPanel extends VBox {
         });
     }
 
+    /**
+     * Bật hoặc tắt trạng thái tương tác của các thành phần giao diện (nút bấm, ô nhập liệu) để ngăn thao tác khi đang xử lý.
+     */
     public void setEnabled(boolean enabled) {
         connectButton.setDisable(!enabled);
         serverField.setDisable(!enabled);
@@ -175,17 +195,29 @@ public class ConnectionPanel extends VBox {
         passwordField.setDisable(!enabled);
     }
 
+    /**
+     * Phương thức placeholder để xử lý hiển thị khi đăng nhập thành công (hiện tại chưa có logic cụ thể).
+     */
     public void showSuccess(String username) {
     }
 
+    /**
+     * Hiển thị một thông báo dạng popup (Alert) lên màn hình với nội dung và loại thông báo cụ thể.
+     */
     private void showAlert(String msg, Alert.AlertType type) {
         new Alert(type, msg, ButtonType.OK).show();
     }
 
+    /**
+     * Lấy địa chỉ Server IP hiện tại từ ô nhập liệu.
+     */
     public String getServer() {
         return serverField.getText();
     }
 
+    /**
+     * Lấy tên người dùng hiện tại từ ô nhập liệu.
+     */
     public String getUsername() {
         return usernameField.getText();
     }

@@ -77,6 +77,9 @@ public class ChatPanel extends StackPane {
     private boolean isTyping = false;
     private Label typingLabel;
 
+    /**
+     * Khởi tạo giao diện Chat Panel, bao gồm danh sách tin nhắn, khu vực nhập liệu, các nút chức năng và xử lý sự kiện.
+     */
     public ChatPanel(String title, boolean enabled, NetworkManager networkManager) {
         this.networkManager = networkManager;
         this.currentTargetName = title;
@@ -165,6 +168,9 @@ public class ChatPanel extends StackPane {
         }
     }
 
+    /**
+     * Tạo phần đầu (Header) của khung chat chứa Avatar, Tên người dùng/nhóm và Nút gọi Video.
+     */
     private HBox createHeader(String title) {
         HBox hbox = new HBox(15);
         hbox.setPadding(new Insets(15, 20, 15, 20));
@@ -208,6 +214,9 @@ public class ChatPanel extends StackPane {
         return hbox;
     }
 
+    /**
+     * Xử lý sự kiện khi nhấn nút Video Call (Gọi hoặc Kết thúc cuộc gọi).
+     */
     private void handleVideoBtnClick() {
         if (isInCall) triggerEndCall();
         else if (networkManager != null) {
@@ -216,6 +225,9 @@ public class ChatPanel extends StackPane {
         }
     }
 
+    /**
+     * Cập nhật văn bản và màu sắc cho nhãn trạng thái (Status Label).
+     */
     private void setStatusText(String text, String color) {
         Platform.runLater(() -> {
             if (statusLbl != null) {
@@ -225,6 +237,9 @@ public class ChatPanel extends StackPane {
         });
     }
 
+    /**
+     * Cập nhật giao diện nút gọi (Icon, Tooltip, Style) dựa trên trạng thái cuộc gọi.
+     */
     private void updateCallButtonUI() {
         if (isInCall) {
             btnVideo.setText("⏹");
@@ -237,6 +252,9 @@ public class ChatPanel extends StackPane {
         }
     }
 
+    /**
+     * Khởi tạo ServerSocket cục bộ để nhận tín hiệu kết thúc từ trang HTML Video Call.
+     */
     private void startCallbackServer() {
         new Thread(() -> {
             try {
@@ -252,6 +270,9 @@ public class ChatPanel extends StackPane {
         }).start();
     }
 
+    /**
+     * Đóng ServerSocket cục bộ.
+     */
     private void stopCallbackServer() {
         try {
             if (callbackSocket != null && !callbackSocket.isClosed()) callbackSocket.close();
@@ -259,6 +280,9 @@ public class ChatPanel extends StackPane {
         }
     }
 
+    /**
+     * Thiết lập trạng thái khi cuộc gọi bắt đầu.
+     */
     public void setCallStarted(long callId) {
         Platform.runLater(() -> {
             this.currentCallId = callId;
@@ -268,6 +292,9 @@ public class ChatPanel extends StackPane {
         });
     }
 
+    /**
+     * Thiết lập trạng thái khi cuộc gọi kết thúc và reset giao diện.
+     */
     public void setCallEnded() {
         Platform.runLater(() -> {
             this.currentCallId = -1;
@@ -278,6 +305,9 @@ public class ChatPanel extends StackPane {
         });
     }
 
+    /**
+     * Gửi yêu cầu kết thúc cuộc gọi tới Server.
+     */
     public void triggerEndCall() {
         if (currentCallId != -1) {
             networkManager.getOut().println("CALL_END|" + currentTargetName + "|" + currentCallId);
@@ -285,6 +315,9 @@ public class ChatPanel extends StackPane {
         setCallEnded();
     }
 
+    /**
+     * Bắt đầu cuộc gọi Video Call bằng cách tạo file HTML tạm thời và mở trình duyệt mặc định.
+     */
     public void startExternalVideoCall(boolean isCaller) {
         try {
             startCallbackServer();
@@ -321,13 +354,22 @@ public class ChatPanel extends StackPane {
         }
     }
 
+    /**
+     * Xử lý tín hiệu đến (Phương thức giữ chỗ cho mở rộng sau này).
+     */
     public void handleIncomingSignal(String signal) {
     }
 
+    /**
+     * Thiết lập ID cho cuộc gọi hiện tại.
+     */
     public void setCallId(long id) {
         this.currentCallId = id;
     }
 
+    /**
+     * Lấy nội dung từ ô nhập liệu và gửi tin nhắn văn bản đi.
+     */
     private void sendMessage() {
         if (sendAction != null) {
             String msg = messageField.getText().trim();
@@ -339,6 +381,9 @@ public class ChatPanel extends StackPane {
         }
     }
 
+    /**
+     * Mở hộp thoại chọn file, xử lý logic mã hóa (nếu chọn) và gửi file.
+     */
     private void chooseAndSendFile() {
         if (networkManager == null) {
             showAlert("Chưa kết nối!");
@@ -383,7 +428,7 @@ public class ChatPanel extends StackPane {
                         sendFileAction.accept(encryptedFile.getName(), encryptedFile.length(), "enc"); // fileType là 'enc'
                         sendActualFile(encryptedFile, encryptedFile.getName());
 
-                         encryptedFile.deleteOnExit();
+                        encryptedFile.deleteOnExit();
 
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -399,6 +444,9 @@ public class ChatPanel extends StackPane {
         }
     }
 
+    /**
+     * Gửi dữ liệu file thực tế qua Socket phụ (cổng 5556).
+     */
     private void sendActualFile(File file, String fileName) {
         new Thread(() -> {
             try (Socket s = new Socket("localhost", 5556);
@@ -417,10 +465,16 @@ public class ChatPanel extends StackPane {
         }).start();
     }
 
+    /**
+     * Hiển thị bảng chọn Emoji.
+     */
     private void showEmojiPicker() {
         EmojiPicker.showEmojiPicker(getScene().getWindow(), messageField::appendText);
     }
 
+    /**
+     * Thêm tin nhắn mới vào danh sách và sắp xếp lại theo thời gian.
+     */
     public void addMessageAndSort(Message m) {
         Platform.runLater(() -> {
             messages.add(m);
@@ -429,6 +483,9 @@ public class ChatPanel extends StackPane {
         });
     }
 
+    /**
+     * Thêm tin nhắn vào cuối danh sách.
+     */
     public void appendMessage(Message m) {
         Platform.runLater(() -> {
             messages.add(m);
@@ -436,10 +493,16 @@ public class ChatPanel extends StackPane {
         });
     }
 
+    /**
+     * Xóa toàn bộ tin nhắn trên giao diện.
+     */
     public void clearMessages() {
         Platform.runLater(messages::clear);
     }
 
+    /**
+     * Cuộn danh sách tin nhắn xuống dưới cùng.
+     */
     private void scrollToBottom() {
         Platform.runLater(() -> {
             if (!messages.isEmpty()) {
@@ -448,6 +511,9 @@ public class ChatPanel extends StackPane {
         });
     }
 
+    /**
+     * Tạo nút bấm có biểu tượng và tooltip.
+     */
     private Button createIconButton(String icon, String tooltip) {
         Button btn = new Button(icon);
         btn.getStyleClass().add("icon-button");
@@ -455,42 +521,69 @@ public class ChatPanel extends StackPane {
         return btn;
     }
 
+    /**
+     * Lấy phần mở rộng (đuôi file) từ tên file.
+     */
     private String getFileExtension(String f) {
         int i = f.lastIndexOf('.');
         return i == -1 ? "unknown" : f.substring(i + 1);
     }
 
+    /**
+     * Hiển thị thông báo lỗi dạng Popup.
+     */
     private void showAlert(String m) {
         new Alert(Alert.AlertType.ERROR, m, ButtonType.OK).show();
     }
 
+    /**
+     * Đăng ký callback xử lý khi gửi tin nhắn văn bản.
+     */
     public void setSendAction(Consumer<String> a) {
         this.sendAction = a;
     }
 
+    /**
+     * Đăng ký callback xử lý khi gửi file.
+     */
     public void setSendFileAction(TriConsumer<String, Long, String> a) {
         this.sendFileAction = a;
     }
 
+    /**
+     * Bật/Tắt khả năng nhập liệu và gửi tin.
+     */
     public void setInputEnabled(boolean e) {
         messageField.setDisable(!e);
         sendButton.setDisable(!e);
     }
 
+    /**
+     * Ẩn các nút chức năng đa phương tiện (File, Emoji...).
+     */
     public void disableMediaButtons() {
         fileButton.setVisible(false);
         emojiButton.setVisible(false);
     }
 
+    /**
+     * Ẩn toàn bộ khu vực nhập liệu (Dùng cho Broadcast).
+     */
     public void hideInputArea() {
         inputBox.setVisible(false);
         inputBox.setManaged(false);
     }
 
+    /**
+     * Đăng ký callback xử lý khi tải file.
+     */
     public void setDownloadAction(Consumer<String> action) {
         this.downloadAction = action;
     }
 
+    /**
+     * Kích hoạt hành động tải file.
+     */
     public void downloadFile(String fileName, File saveDest) {
         if (downloadAction != null) {
             downloadAction.accept(fileName);
@@ -498,6 +591,9 @@ public class ChatPanel extends StackPane {
         }
     }
 
+    /**
+     * Hiển thị hoặc ẩn trạng thái "Đang nhập..." của đối phương.
+     */
     public void showTyping(String who, boolean typing) {
         Platform.runLater(() -> {
             if (typing) {
@@ -509,6 +605,9 @@ public class ChatPanel extends StackPane {
         });
     }
 
+    /**
+     * Xử lý logic nút ghi âm: Bắt đầu ghi hoặc Dừng và Gửi.
+     */
     private void handleMicToggle() {
         if (networkManager == null) return;
 
@@ -559,6 +658,9 @@ public class ChatPanel extends StackPane {
 
         private final Circle miniAvatar = new Circle(14);
 
+        /**
+         * Khởi tạo Cell hiển thị tin nhắn tùy chỉnh.
+         */
         public MessageCell(ChatPanel parent) {
             this.parent = parent;
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -572,6 +674,9 @@ public class ChatPanel extends StackPane {
         }
 
         @Override
+        /**
+         * Cập nhật nội dung hiển thị cho từng loại tin nhắn (Text, Emoji, File, Call, Voice).
+         */
         protected void updateItem(Message msg, boolean empty) {
             super.updateItem(msg, empty);
             if (empty || msg == null) {

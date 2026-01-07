@@ -14,6 +14,10 @@ public class ControlPanel extends HBox {
     private final Label clientCountLabel;
     private final ChatServer chatServer;
 
+    /**
+     * Khởi tạo bảng điều khiển (Control Panel) cho Server.
+     * Thiết lập giao diện, các nút Start/Stop và các nhãn trạng thái.
+     */
     public ControlPanel(ChatServer chatServer) {
         this.chatServer = chatServer;
         setAlignment(Pos.CENTER_LEFT);
@@ -65,6 +69,9 @@ public class ControlPanel extends HBox {
         );
     }
 
+    /**
+     * Cập nhật trạng thái hiển thị của giao diện (Nút và Nhãn) dựa trên trạng thái chạy của Server.
+     */
     public void setRunning(boolean running) {
         startButton.setDisable(running);
         stopButton.setDisable(!running);
@@ -77,6 +84,9 @@ public class ControlPanel extends HBox {
         }
     }
 
+    /**
+     * Cập nhật số lượng Client đang kết nối lên giao diện.
+     */
     public void updateClientCount(int count) {
         clientCountLabel.setText("Clients: " + count);
     }

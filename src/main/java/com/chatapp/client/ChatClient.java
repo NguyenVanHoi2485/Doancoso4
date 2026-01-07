@@ -30,6 +30,10 @@ public class ChatClient extends Application {
     private ChatClientController controller;
     private Stage primaryStage;
 
+    /**
+     * Phương thức khởi chạy chính của ứng dụng JavaFX via Application.
+     * Khởi tạo NetworkManager, Controller và hiển thị màn hình đăng nhập ban đầu.
+     */
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
@@ -45,6 +49,10 @@ public class ChatClient extends Application {
     }
 
     // === MÀN HÌNH 1: ĐĂNG NHẬP ===
+    /**
+     * Hiển thị màn hình đăng nhập (Scene 1).
+     * Thiết lập ConnectionPanel để người dùng nhập thông tin server và username.
+     */
     public void showLoginScene() {
         connectionPanel = new ConnectionPanel(this);
         StackPane root = new StackPane(connectionPanel);
@@ -56,6 +64,10 @@ public class ChatClient extends Application {
     }
 
     // === MÀN HÌNH 2: CHAT CHÍNH ===
+    /**
+     * Hiển thị giao diện chat chính (Scene 2) sau khi đăng nhập thành công.
+     * Bao gồm thanh sidebar (icon, danh sách user/group) và khu vực tab chat chính.
+     */
     public void showMainChatScene() {
         BorderPane mainLayout = new BorderPane();
         HBox leftSide = new HBox();
@@ -113,6 +125,9 @@ public class ChatClient extends Application {
         primaryStage.centerOnScreen();
     }
 
+    /**
+     * Áp dụng file CSS giao diện cho một Scene cụ thể.
+     */
     private void applyCSS(Scene scene) {
         try {
             scene.getStylesheets().add(getClass().getResource("/client-style.css").toExternalForm());
@@ -122,6 +137,10 @@ public class ChatClient extends Application {
     }
 
     // === LOGIC MỞ TAB CHAT ===
+    /**
+     * Mở tab chat riêng tư (1-1) với một người dùng khác.
+     * Thiết lập các hành động gửi tin nhắn, gửi file và tải file cho tab này.
+     */
     public void openPrivateChat(String username) {
         if (username.equals(networkManager.getMyUsername())) {
             showAlert("You cannot chat with yourself!");
@@ -162,6 +181,10 @@ public class ChatClient extends Application {
         }
     }
 
+    /**
+     * Mở tab chat nhóm.
+     * Thiết lập các hành động gửi tin/file tới nhóm cho tab này.
+     */
     public void openGroupChat(String groupName) {
         String key = "GROUP_" + groupName;
         ChatPanel panel = chatPanels.get(key);
@@ -197,6 +220,10 @@ public class ChatClient extends Application {
         }
     }
 
+    /**
+     * Hàm hỗ trợ tạo một Tab UI mới, gắn vào TabPane và chọn nó.
+     * Cũng đăng ký listener để tải lịch sử chat khi tab được chọn.
+     */
     private void createAndSelectTab(String title, ChatPanel panel, String key, String type, String target) {
         Platform.runLater(() -> {
             Tab newTab = new Tab(title, panel);
@@ -212,6 +239,9 @@ public class ChatClient extends Application {
         });
     }
 
+    /**
+     * Chuyển focus sang một tab chat đã tồn tại.
+     */
     private void selectTab(ChatPanel panel) {
         Platform.runLater(() -> {
             for (Tab tab : tabbedPane.getTabs()) {
@@ -224,18 +254,30 @@ public class ChatClient extends Application {
     }
 
     // Delegates
+    /**
+     * Gọi Controller để thực hiện logic tạo nhóm mới.
+     */
     public void createGroup() {
         controller.createGroup();
     }
 
+    /**
+     * Gọi Controller để thực hiện logic tham gia một nhóm.
+     */
     public void joinGroup() {
         controller.joinGroup();
     }
 
+    /**
+     * Gọi Controller để thực hiện logic rời khỏi một nhóm.
+     */
     public void leaveGroup(String groupName) {
         controller.leaveGroup(groupName);
     }
 
+    /**
+     * Đóng tab chat cụ thể dựa trên key và xóa khỏi danh sách quản lý.
+     */
     public void closeChatTab(String key) {
         ChatPanel panel = chatPanels.get(key);
         if (panel == null) return;
@@ -245,52 +287,89 @@ public class ChatClient extends Application {
         });
     }
 
+    /**
+     * Yêu cầu NetworkManager thực hiện kết nối tới server.
+     */
     public void connect(String server) {
         networkManager.connect(server);
     }
 
+    /**
+     * Ngắt kết nối mạng và kích hoạt lại panel kết nối.
+     */
     public void disconnect() {
         networkManager.disconnect();
         if (connectionPanel != null) connectionPanel.setEnabled(true);
     }
 
     // Getters
+
+    /**
+     * Lấy map chứa danh sách các ChatPanel đang mở.
+     */
     public Map<String, ChatPanel> getChatPanels() {
         return chatPanels;
     }
 
+    /**
+     * Lấy tập hợp các nhóm mà user hiện tại đang tham gia.
+     */
     public Set<String> getMyGroups() {
         return myGroups;
     }
 
+    /**
+     * Lấy tham chiếu đến panel danh sách người dùng.
+     */
     public UsersPanel getUsersPanel() {
         return usersPanel;
     }
 
+    /**
+     * Lấy tham chiếu đến panel danh sách nhóm.
+     */
     public GroupsPanel getGroupsPanel() {
         return groupsPanel;
     }
 
+    /**
+     * Lấy tham chiếu đến TabPane chính.
+     */
     public TabPane getTabbedPane() {
         return tabbedPane;
     }
 
+    /**
+     * Lấy tham chiếu đến cửa sổ chính (Stage).
+     */
     public Stage getPrimaryStage() {
         return primaryStage;
     }
 
+    /**
+     * Lấy tham chiếu đến đối tượng quản lý mạng.
+     */
     public NetworkManager getNetworkManager() {
         return networkManager;
     }
 
+    /**
+     * Lấy tham chiếu đến controller chính.
+     */
     public ChatClientController getController() {
         return controller;
     }
 
+    /**
+     * Lấy tham chiếu đến panel kết nối/đăng nhập.
+     */
     public ConnectionPanel getConnectionPanel() {
         return connectionPanel;
     }
 
+    /**
+     * Hiển thị một hộp thoại thông báo (Alert) cho người dùng.
+     */
     public void showAlert(String message) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -302,6 +381,9 @@ public class ChatClient extends Application {
         });
     }
 
+    /**
+     * Thêm một tin nhắn hệ thống vào tab Broadcast/Server Info.
+     */
     public void appendToBroadcast(String messageText) {
         ChatPanel broadcastPanel = chatPanels.get("BROADCAST");
         if (broadcastPanel != null) {
@@ -310,6 +392,9 @@ public class ChatClient extends Application {
         }
     }
 
+    /**
+     * Chuyển focus về tab Broadcast (tab đầu tiên).
+     */
     public void selectBroadcastTab() {
         Platform.runLater(() -> {
             if (!tabbedPane.getTabs().isEmpty()) {

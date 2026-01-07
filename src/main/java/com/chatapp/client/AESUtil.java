@@ -14,6 +14,10 @@ public class AESUtil {
 
     private static final String ALGORITHM = "AES";
 
+    /**
+     * Tạo và trả về khóa bí mật (SecretKeySpec) cho thuật toán AES dựa trên mật khẩu đầu vào.
+     * Mật khẩu được băm bằng SHA-256 và cắt lấy 16 byte đầu tiên để đảm bảo độ dài khóa 128-bit.
+     */
     private static SecretKeySpec getKey(String password) throws Exception {
         byte[] key = password.getBytes("UTF-8");
         MessageDigest sha = MessageDigest.getInstance("SHA-256");
@@ -24,6 +28,11 @@ public class AESUtil {
     }
 
     // --- MÃ HÓA FILE ---
+
+    /**
+     * Thực hiện mã hóa nội dung của file đầu vào sử dụng thuật toán AES và mật khẩu được cung cấp.
+     * Kết quả được ghi vào một file mới cùng thư mục với đuôi mở rộng ".enc".
+     */
     public static File encryptFile(File inputFile, String password) throws Exception {
         // Tạo file đầu ra có đuôi .enc
         File outputFile = new File(inputFile.getParent(), inputFile.getName() + ".enc");
@@ -46,6 +55,11 @@ public class AESUtil {
     }
 
     // --- GIẢI MÃ FILE ---
+
+    /**
+     * Thực hiện giải mã file đầu vào (thường có đuôi .enc) trở lại định dạng gốc ban đầu.
+     * File kết quả sẽ được loại bỏ phần mở rộng ".enc" và lưu trong cùng thư mục.
+     */
     public static File decryptFile(File inputFile, String password) throws Exception {
         // Tên file gốc (Bỏ đuôi .enc)
         String outputName = inputFile.getName().replace(".enc", "");

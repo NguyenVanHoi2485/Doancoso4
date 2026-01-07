@@ -20,6 +20,9 @@ public class SearchPanel extends VBox {
     private final FilteredList<Message> filteredMessages;
     private final Consumer<Message> onMessageSelected;
 
+    /**
+     * Khởi tạo giao diện tìm kiếm tin nhắn.
+     */
     public SearchPanel(ObservableList<Message> messages, Consumer<Message> onMessageSelected) {
         this.allMessages = messages;
         this.onMessageSelected = onMessageSelected;
@@ -50,6 +53,9 @@ public class SearchPanel extends VBox {
         getChildren().addAll(createSearchHeader(), searchResults);
     }
 
+    /**
+     * Tạo phần đầu của bảng tìm kiếm gồm tiêu đề, ô nhập liệu và nút đóng.
+     */
     private HBox createSearchHeader() {
         Label title = new Label("Search Messages");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
@@ -65,6 +71,9 @@ public class SearchPanel extends VBox {
         return header;
     }
 
+    /**
+     * Thực hiện lọc danh sách tin nhắn dựa trên từ khóa tìm kiếm.
+     */
     private void performSearch(String query) {
         if (query == null || query.trim().isEmpty()) {
             filteredMessages.setPredicate(null);
@@ -84,6 +93,9 @@ public class SearchPanel extends VBox {
         private final Label timeLabel = new Label();
         private final Label contentLabel = new Label();
 
+        /**
+         * Khởi tạo Cell hiển thị kết quả tìm kiếm.
+         */
         public SearchResultCell() {
             container.setPadding(new Insets(5));
 
@@ -97,6 +109,9 @@ public class SearchPanel extends VBox {
         }
 
         @Override
+        /**
+         * Cập nhật nội dung cho từng dòng kết quả tìm kiếm.
+         */
         protected void updateItem(Message message, boolean empty) {
             super.updateItem(message, empty);
 

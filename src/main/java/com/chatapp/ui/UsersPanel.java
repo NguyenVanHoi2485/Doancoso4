@@ -29,6 +29,9 @@ public class UsersPanel extends BorderPane {
     private final TableView<ClientRow> clientTable;
     private final ChatClient chatClient;
 
+    /**
+     * Khởi tạo giao diện danh sách người dùng Online.
+     */
     public UsersPanel(ChatClient chatClient) {
         this.chatClient = chatClient;
         this.clientData = FXCollections.observableArrayList();
@@ -78,10 +81,16 @@ public class UsersPanel extends BorderPane {
         setCenter(content);
     }
 
+    /**
+     * Xử lý sự kiện click chuột trên danh sách user (Click đúp để nhắn tin riêng).
+     */
     private void handleMouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) openSelectedPrivateChat();
     }
 
+    /**
+     * Mở tab chat riêng với người dùng được chọn.
+     */
     private void openSelectedPrivateChat() {
         ClientRow selected = clientTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
@@ -89,6 +98,9 @@ public class UsersPanel extends BorderPane {
         }
     }
 
+    /**
+     * Lấy danh sách dữ liệu người dùng Online hiện tại.
+     */
     public ObservableList<ClientRow> getClientData() {
         return clientData;
     }

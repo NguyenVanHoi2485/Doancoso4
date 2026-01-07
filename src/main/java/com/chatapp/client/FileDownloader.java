@@ -12,6 +12,11 @@ public class FileDownloader {
 
     private static final int DOWNLOAD_PORT = 5557; // Port dành riêng cho tải file
 
+    /**
+     * Phương thức static thực hiện quy trình tải file từ server về máy client.
+     * Quy trình này chạy trên một luồng (thread) riêng biệt để đảm bảo không làm đóng băng giao diện người dùng.
+     * Nó kết nối đến cổng tải file riêng, gửi yêu cầu, nhận dữ liệu stream và lưu vào thư mục 'client_downloads'.
+     */
     public static void download(String serverIp, String fileName, ChatClient chatClient) {
         // Chạy trên luồng riêng để không làm đơ giao diện
         new Thread(() -> {

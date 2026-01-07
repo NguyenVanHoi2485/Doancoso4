@@ -10,6 +10,10 @@ public class MessageUtils {
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("EEE, MMM dd");
 
+    /**
+     * Định dạng hiển thị thời gian của tin nhắn dựa trên khoảng cách so với hiện tại
+     * (Hôm nay, Hôm qua, trong tuần, hoặc ngày cụ thể) theo múi giờ Việt Nam.
+     */
     public static String formatMessageTime(LocalDateTime timestamp) {
         ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
         LocalDateTime now = LocalDateTime.now(zone);
@@ -26,6 +30,10 @@ public class MessageUtils {
         }
     }
 
+    /**
+     * Xác định xem có cần hiển thị thanh phân cách ngày giữa tin nhắn hiện tại và tin nhắn trước đó hay không
+     * (trả về true nếu hai tin nhắn thuộc hai ngày khác nhau).
+     */
     public static boolean shouldShowDateSeparator(LocalDateTime current, LocalDateTime previous) {
         if (previous == null) return true;
 
@@ -34,6 +42,9 @@ public class MessageUtils {
         return !current.atZone(zone).toLocalDate().equals(previous.atZone(zone).toLocalDate());
     }
 
+    /**
+     * Tạo chuỗi văn bản hiển thị trên thanh phân cách ngày (VD: "Today", "Yesterday" hoặc ngày tháng đầy đủ).
+     */
     public static String getDateSeparatorText(LocalDateTime date) {
         ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
         LocalDateTime now = LocalDateTime.now(zone);

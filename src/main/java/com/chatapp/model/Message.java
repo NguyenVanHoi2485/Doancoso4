@@ -17,7 +17,9 @@ public class Message implements Serializable {
 
     // --- CONSTRUCTORS ---
 
-    // Constructor đầy đủ
+    /**
+     * Khởi tạo đối tượng tin nhắn với đầy đủ tất cả các thuộc tính chi tiết.
+     */
     public Message(MessageType type, String content, String sender, LocalDateTime timestamp,
                    String metadata, String fileName, Long fileSize, String fileType,
                    Double uploadProgress, MessageStatus status) {
@@ -33,34 +35,50 @@ public class Message implements Serializable {
         this.status = status;
     }
 
-    // Constructor đơn giản (Dùng nhiều nhất)
+    /**
+     * Khởi tạo tin nhắn cơ bản (thường dùng nhất cho tin nhắn văn bản thông thường).
+     * Các trường file và metadata sẽ để trống, trạng thái mặc định là SENT.
+     */
     public Message(MessageType type, String content, String sender, LocalDateTime timestamp) {
         this(type, content, sender, timestamp, null, null, null, null, 1.0, MessageStatus.SENT);
     }
 
-    // Constructor có metadata
+    /**
+     * Khởi tạo tin nhắn có kèm dữ liệu bổ sung (metadata).
+     */
     public Message(MessageType type, String content, String sender, LocalDateTime timestamp, String metadata) {
         this(type, content, sender, timestamp, metadata, null, null, null, 1.0, MessageStatus.SENT);
     }
 
     // --- FACTORY METHODS (Phương thức tạo nhanh) ---
 
+    /**
+     * Phương thức tiện ích để tạo nhanh một tin nhắn văn bản (Text).
+     */
     public static Message createTextMessage(String content, String sender) {
         return new Message(MessageType.TEXT, content, sender, LocalDateTime.now());
     }
 
+    /**
+     * Tạo tin nhắn đại diện cho một file đã được gửi (chứa thông tin tên file, kích thước, loại file).
+     */
     public static Message createFileMessage(String fileName, Long fileSize, String fileType, String sender) {
         String content = "File: " + fileName;
         return new Message(MessageType.FILE, content, sender, LocalDateTime.now(),
                 null, fileName, fileSize, fileType, 1.0, MessageStatus.SENT);
     }
 
-    // Thêm Factory cho Voice để tiện sử dụng
+    /**
+     * Tạo tin nhắn đại diện cho một đoạn ghi âm thoại (Voice Chat).
+     */
     public static Message createVoiceMessage(String fileName, String sender) {
         return new Message(MessageType.VOICE, fileName, sender, LocalDateTime.now(),
                 null, fileName, 0L, "wav", 1.0, MessageStatus.SENT);
     }
 
+    /**
+     * Tạo tin nhắn hiển thị trạng thái đang tải file lên (kèm theo thanh tiến độ upload).
+     */
     public static Message createFileUploadMessage(String fileName, Long fileSize, String fileType,
                                                   String sender, Double progress) {
         String content = "Uploading: " + fileName;
@@ -68,21 +86,32 @@ public class Message implements Serializable {
                 null, fileName, fileSize, fileType, progress, MessageStatus.SENDING);
     }
 
+    /**
+     * Tạo tin nhắn thông báo từ hệ thống (ví dụ: server thông báo user tham gia/thoát).
+     */
     public static Message createSystemMessage(String content) {
         return new Message(MessageType.SYSTEM, content, "SYSTEM", LocalDateTime.now());
     }
 
+    /**
+     * Tạo tin nhắn chứa biểu tượng cảm xúc (Emoji), mã emoji được lưu trong metadata.
+     */
     public static Message createEmojiMessage(String emojiCode, String sender) {
         String content = "Sent an emoji: " + emojiCode;
         return new Message(MessageType.EMOJI, content, sender, LocalDateTime.now(),
                 emojiCode, null, null, null, 1.0, MessageStatus.SENT);
     }
 
+    /**
+     * Tạo tin nhắn ghi lại lịch sử cuộc gọi (Video/Audio call).
+     */
     public static Message createCallMessage(String content, String sender, LocalDateTime timestamp) {
         return new Message(MessageType.CALL, content, sender, timestamp);
     }
 
-    // Method withTimestamp (giữ nguyên logic cũ nhưng trả về object mới hoặc this đều được)
+    /**
+     * Cập nhật thời gian cho tin nhắn và trả về chính đối tượng đó (Fluent API).
+     */
     public Message withTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
         return this;
@@ -177,25 +206,39 @@ public class Message implements Serializable {
 
     // --- HELPER METHODS ---
 
+    /**
+     * Lấy mã Emoji từ dữ liệu metadata.
+     */
     public String getEmojiCode() {
         return metadata;
     }
 
-    // Setter giả lập cho Emoji (lưu vào metadata)
+    /**
+     * Lưu mã Emoji vào metadata.
+     */
     public void setEmojiCode(String emojiCode) {
         this.metadata = emojiCode;
     }
 
+    /**
+     * Lấy chuỗi thời gian (giờ:phút) định dạng ngắn gọn để hiển thị lên giao diện.
+     */
     public String getFormattedTime() {
         if (timestamp == null) return "";
         return timestamp.toLocalTime().withNano(0).toString();
     }
 
+    /**
+     * Lấy chuỗi ngày tháng (năm-tháng-ngày) để hiển thị.
+     */
     public String getFormattedDate() {
         if (timestamp == null) return "";
         return timestamp.toLocalDate().toString();
     }
 
+    /**
+     * Chuyển đổi kích thước file từ byte sang định dạng dễ đọc (B, KB, MB).
+     */
     public String getFormattedFileSize() {
         if (fileSize == null) return "";
         if (fileSize < 1024) {
@@ -207,6 +250,9 @@ public class Message implements Serializable {
         }
     }
 
+    /**
+     * Lấy biểu tượng (icon) đại diện cho file dựa trên phần mở rộng hoặc loại file.
+     */
     public String getFileIcon() {
         if (fileType == null && fileName != null && fileName.contains(".")) {
             // Tự động đoán fileType từ fileName nếu null
@@ -218,6 +264,9 @@ public class Message implements Serializable {
         return "📎";
     }
 
+    /**
+     * Hàm nội bộ xác định icon cụ thể dựa vào phần mở rộng của file (VD: pdf, jpg, doc...).
+     */
     private String getIconByExt(String ext) {
         switch (ext.toLowerCase()) {
             case "pdf":

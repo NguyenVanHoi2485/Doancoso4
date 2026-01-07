@@ -31,6 +31,9 @@ public class GroupsPanel extends BorderPane {
     private final TableView<GroupRow> groupTable;
     private final ChatClient chatClient;
 
+    /**
+     * Khởi tạo giao diện quản lý nhóm (Danh sách nhóm, nút tạo, tham gia, rời nhóm).
+     */
     public GroupsPanel(ChatClient chatClient) {
         this.chatClient = chatClient;
         this.groupData = FXCollections.observableArrayList();
@@ -90,24 +93,39 @@ public class GroupsPanel extends BorderPane {
         setCenter(content);
     }
 
+    /**
+     * Xử lý sự kiện click chuột trên bảng nhóm (Click đúp để mở chat).
+     */
     private void handleMouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) openSelectedGroup();
     }
 
+    /**
+     * Mở tab chat nhóm cho nhóm đang được chọn.
+     */
     private void openSelectedGroup() {
         GroupRow row = groupTable.getSelectionModel().getSelectedItem();
         if (row != null) chatClient.openGroupChat(row.getGroupName());
     }
 
+    /**
+     * Rời khỏi nhóm đang được chọn.
+     */
     private void leaveSelectedGroup() {
         GroupRow row = groupTable.getSelectionModel().getSelectedItem();
         if (row != null) chatClient.leaveGroup(row.getGroupName());
     }
 
+    /**
+     * Lấy danh sách dữ liệu các nhóm hiện tại.
+     */
     public ObservableList<GroupRow> getGroupData() {
         return groupData;
     }
 
+    /**
+     * Thêm một nhóm mới vào danh sách hiển thị (nếu chưa tồn tại).
+     */
     public void addGroup(String groupName) {
         Platform.runLater(() -> {
             if (groupData.stream().noneMatch(row -> row.getGroupName().equals(groupName))) {
@@ -116,6 +134,9 @@ public class GroupsPanel extends BorderPane {
         });
     }
 
+    /**
+     * Xóa một nhóm khỏi danh sách hiển thị.
+     */
     public void removeGroup(String groupName) {
         Platform.runLater(() -> groupData.removeIf(row -> row.getGroupName().equals(groupName)));
     }
